@@ -1,5 +1,9 @@
 package main
 
+import (
+	"crypto/sha256"
+)
+
 type Transaction struct {
 	Hash       [32]byte
 	Inputs     []*TransactionInput
@@ -27,7 +31,7 @@ func NewCoinBaseTransaction(to string, amount int) *Transaction {
 		Outputs:    []*TransactionOutput{TXO},
 		IsCoinbase: true,
 		Nonce:      0,
-		Hash:       [32]byte{},
+		Hash:       sha256.Sum256([]byte(to)),
 	}
 }
 

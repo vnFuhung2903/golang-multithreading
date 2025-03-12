@@ -1,14 +1,14 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 type Blockchain struct {
 	blocks []*Block
 }
 
-func (blockchain *Blockchain) AddBlock(data []*Transaction) {
-	prevBlock := blockchain.blocks[len(blockchain.blocks)-1]
-	newBlock := NewBlock(data, prevBlock)
+func (blockchain *Blockchain) AddBlock(newBlock *Block) {
 	blockchain.blocks = append(blockchain.blocks, newBlock)
 }
 
@@ -25,8 +25,30 @@ func NewBlockchain(genesisHash [32]byte) *Blockchain {
 	}
 }
 
-func (blockchain *Blockchain) FindUnspentTransactions(address string) []Transaction {
-	var UTXs []Transaction
+func (blockchain *Blockchain) MineBlock(txs []*Transaction) *Block {
+	for _, tx := range txs {
+		if blockchain.checkTransactionExists(tx) {
+			panic("ERROR: Transaction existed")
+		}
+	}
+	newBlock := NewBlock(txs, blockchain.blocks[len(blockchain.blocks)-1])
+	return newBlock
+}
+
+func (blockchain *Blockchain) FindSpendableUTXO(address string) (int, []int) {
+	UTXOs := blockchain.findWalletTXO(address)
+	var spendableUTXO []int
+	res := 0
+
+	for _, unspentTXO := range UTXOs {
+		res += unspentTXO
+		spendableUTXO = append(spendableUTXO, unspentTXO)
+	}
+	return res, spendableUTXO
+}
+
+func (blockchain *Blockchain) findWalletTXO(address string) []int {
+	var UTXOs []int
 	spentUTXOs := make(map[[32]byte][]int)
 
 	for _, block := range blockchain.blocks {
@@ -37,42 +59,38 @@ func (blockchain *Blockchain) FindUnspentTransactions(address string) []Transact
 					continue
 				}
 				if output.UnlockScript == address {
-					UTXs = append(UTXs, *tx)
+					UTXOs = append(UTXOs, output.Value)
 				}
 				if tx.IsCoinbase {
 					continue
 				}
-				for _, input := range tx.Inputs {
-					if input.LockScript == address {
-						spentUTXOs[input.Hash] = append(spentUTXOs[input.Hash], input.Value)
-					}
+			}
+			for _, input := range tx.Inputs {
+				if input.LockScript == address {
+					UTXOs = append(UTXOs, -input.Value)
+					spentUTXOs[input.Hash] = append(spentUTXOs[input.Hash], input.Value)
 				}
 			}
 		}
 	}
-	return UTXs
-}
-
-func (blockchain *Blockchain) FindSpendableUTXO(address string) (int, []int) {
-	unspentTx := blockchain.FindUnspentTransactions(address)
-	var spendableUTXO []int
-	res := 0
-
-	for _, tx := range unspentTx {
-		for _, txo := range tx.Outputs {
-			if txo.UnlockScript == address {
-				res += txo.Value
-				spendableUTXO = append(spendableUTXO, txo.Value)
-			}
-		}
-	}
-	return res, spendableUTXO
+	return UTXOs
 }
 
 func checkTXOSpent(spentUTXOs []int, id int) bool {
 	for _, spentUTXO := range spentUTXOs {
 		if spentUTXO == id {
 			return true
+		}
+	}
+	return false
+}
+
+func (blockchain *Blockchain) checkTransactionExists(anonymousTx *Transaction) bool {
+	for _, block := range blockchain.blocks {
+		for _, tx := range block.Data {
+			if tx.Hash == anonymousTx.Hash {
+				return true
+			}
 		}
 	}
 	return false
