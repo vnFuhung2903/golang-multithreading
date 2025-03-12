@@ -10,6 +10,8 @@ func main() {
 	myBlockchain := NewBlockchain(genesisHash)
 	fmt.Println(myBlockchain)
 
-	wallet := NewWallet()
-	fmt.Println(wallet)
+	alice := NewWallet()
+	fmt.Println("Alice's wallet: ", alice.Address())
+	bob := NewWallet()
+	fmt.Println("Bob's wallet: ", bob.Address())
 }

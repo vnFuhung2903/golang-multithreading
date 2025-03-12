@@ -1,13 +1,13 @@
 package main
 
 import (
-	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
+	"golang.org/x/crypto/ripemd160"
 )
 
 type Wallet struct {
@@ -25,17 +25,22 @@ func NewWallet() *Wallet {
 }
 
 func (wallet *Wallet) Address() string {
-	hash := crypto.RIPEMD160.New()
-	publicKeyHash, err := hash.Write(wallet.PublicKey[:])
+	publicKeyHash, err := wallet.HashPublicKey()
 	if err != nil {
 		fmt.Println(err)
 	}
 	version := byte(0x00)
-	check := checksum([]byte{byte(publicKeyHash)})
+	check := checksum(publicKeyHash)
 
-	address := append([]byte{version}, byte(publicKeyHash))
+	address := append([]byte{version}, publicKeyHash...)
 	address = append(address, check...)
 	return base58.Encode(address)
+}
+
+func (wallet *Wallet) HashPublicKey() ([]byte, error) {
+	hash := ripemd160.New()
+	_, err := hash.Write(wallet.PublicKey[:])
+	return hash.Sum(wallet.PublicKey[:]), err
 }
 
 func checksum(payload []byte) []byte {

@@ -1,5 +1,8 @@
-module 01
+module go_btc
 
 go 1.24
 
-require github.com/btcsuite/btcutil v1.0.2 // indirect
+require (
+	github.com/btcsuite/btcutil v1.0.2
+	golang.org/x/crypto v0.36.0
+)

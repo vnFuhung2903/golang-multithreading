@@ -10,7 +10,7 @@ import (
 type Block struct {
 	Timestamp int64
 	Hash      [32]byte
-	Data      [32]byte
+	Data      []*Transaction
 	PrevHash  [32]byte
 	Height    int
 }
@@ -22,7 +22,7 @@ func NewBlock(txs []*Transaction, prevBlock *Block) *Block {
 	blockHash := sha256.Sum256(blockHeader)
 	block := &Block{
 		Timestamp: timestamp,
-		Data:      blockData,
+		Data:      txs,
 		PrevHash:  prevBlock.Hash,
 		Hash:      blockHash,
 		Height:    prevBlock.Height + 1,
@@ -33,7 +33,7 @@ func NewBlock(txs []*Transaction, prevBlock *Block) *Block {
 func HashAllTransactions(txs []*Transaction) [32]byte {
 	var blockData []byte
 	for _, tx := range txs {
-		blockData = append(blockData, tx.Hash...)
+		blockData = append(blockData, tx.Hash[:]...)
 	}
 	return sha256.Sum256(blockData)
 }
