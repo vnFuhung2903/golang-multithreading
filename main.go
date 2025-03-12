@@ -18,16 +18,22 @@ func main() {
 	fmt.Println("Bob's wallet:", bob.Address())
 
 	tx := NewCoinBaseTransaction(alice.Address(), 20*decimal)
-	newBlock := myBlockchain.MineBlock([]*Transaction{tx})
-	myBlockchain.AddBlock(newBlock)
+	newBlock := myBlockchain.MineBlock(tx)
+	err := myBlockchain.AddBlock(newBlock)
+	if err != nil {
+		panic(err)
+	}
 	aliceBalance, _ := myBlockchain.FindSpendableUTXO(alice.Address())
 	fmt.Println("Alice's balance:", aliceBalance/decimal)
 
 	tx = NewTransaction(alice, bob.Address(), 1*decimal, myBlockchain)
-	newBlock = myBlockchain.MineBlock([]*Transaction{tx})
-	myBlockchain.AddBlock(newBlock)
+	newBlock = myBlockchain.MineBlock(tx)
+	err = myBlockchain.AddBlock(newBlock)
+	if err != nil {
+		panic(err)
+	}
 	aliceBalance, _ = myBlockchain.FindSpendableUTXO(alice.Address())
-	fmt.Println("Alice's balance: ", aliceBalance/decimal)
+	fmt.Println("Alice's balance:", aliceBalance/decimal)
 	bobBalance, _ := myBlockchain.FindSpendableUTXO(bob.Address())
-	fmt.Println("Alice's balance: ", bobBalance/decimal)
+	fmt.Println("Alice's balance:", bobBalance/decimal)
 }

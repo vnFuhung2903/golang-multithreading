@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"time"
 )
 
@@ -8,8 +9,13 @@ type Blockchain struct {
 	blocks []*Block
 }
 
-func (blockchain *Blockchain) AddBlock(newBlock *Block) {
+func (blockchain *Blockchain) AddBlock(newBlock *Block) error {
+	var err error
+	if newBlock == nil || newBlock.Height < blockchain.blocks[len(blockchain.blocks)-1].Height {
+		err = errors.New("ERROR: New block height is too low")
+	}
 	blockchain.blocks = append(blockchain.blocks, newBlock)
+	return err
 }
 
 func NewBlockchain(genesisHash [32]byte) *Blockchain {
@@ -25,7 +31,7 @@ func NewBlockchain(genesisHash [32]byte) *Blockchain {
 	}
 }
 
-func (blockchain *Blockchain) MineBlock(txs []*Transaction) *Block {
+func (blockchain *Blockchain) MineBlock(txs ...*Transaction) *Block {
 	for _, tx := range txs {
 		if blockchain.checkTransactionExists(tx) {
 			panic("ERROR: Transaction existed")
