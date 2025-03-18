@@ -1,5 +1,4 @@
 # Golang Multithreading
-
 ## Formation history
 Golang (or Go) was created by Google engineers Robert Griesemer, Rob Pike, and Ken Thompson in 2007 to address challenges in software development, such as slow compilation, dependency management, and concurrency. Officially released as an open-source language in 2009, Go was designed to be simple, efficient, and highly scalable, making it well-suited for cloud computing, networking, and system programming. Its syntax draws inspiration from C, but with modern features like garbage collection, built-in concurrency via goroutines, and a robust standard library.
 
@@ -128,7 +127,7 @@ func HashAllTransactions(txs []*Transaction) [32]byte {
 The `range` form of the for loop iterates over a slice or map. When ranging over a slice, two values are returned for each iteration. The first is the index, and the second is a copy of the element at that index. 
 
 ## Package, Import
-Every Go program is made up of packages. Programs start running in package `main`. This program is using the packages with import paths `"fmt"` and `"math/rand"`. By convention, the package name is the same as the last element of the import path.
+Every Go program is made up of packages. Programs start running in package `main`. By convention, the package name is the same as the last element of the import path.
 ```
 import (
 	"crypto/ecdsa"
@@ -157,7 +156,6 @@ The go command uses the `go.sum` file to ensure that future downloads of these m
 
 ## Naming convention
 Names are as important in Go as in any other language. They even have semantic effect: the visibility of a name outside a package is determined by whether its first character is upper case. It's therefore worth spending a little time talking about naming conventions in Go programs.
-
 ### Package name
 By convention, packages are given lower case, single-word names; there should be no need for **_underscores** or **mixedCaps**.
 
@@ -171,55 +169,121 @@ By convention, one-method interfaces are named by the method name plus an `-er` 
 Finally, the convention in Go is to use **MixedCaps** or **mixedCaps** rather than underscores to write multiword names.
 
 ## Data structures
-
-### Boolean types
+### Boolean
 `bool` values are `true` and `false`
 
-### Numeric types
+### Numeric
 - Integers: `int`, `int8`, `int16`, `int32`, `int64`
 - Unsigned integers: `uint`, `uint8`, `uint16`, `uint32`, `uint64`
 - Floating points: `float32`, `float64`
 - Complex numbers: `complex64`, `complex128`
-- String: `string` is immutable utf-8 encoded text
 - Byte: `byte` is an alias for `uint8`
 - Rune: `rune` is an alias for `int32`
-
-### String types
+```
+version := byte(0x00)
+const decimal int = 100000000
+```
+### String
 A string type represents the set of string values. A string value is a (possibly empty) sequence of bytes. The number of bytes is called the length of the string and is never negative. Strings are immutable: once created, it is impossible to change the contents of a string. The predeclared string type is `string`.\
 The length of a string s can be discovered using the built-in function `len`. The length is a compile-time constant if the string is a constant. A string's bytes can be accessed by integer indices 0 through `len`-1. It is illegal to take the address of such an element; if s[i] is the i'th byte of a string, &s[i] is invalid.
 
-### Array types
+### Array
 An array is a numbered sequence of elements of a single type, called the element type. The number of elements is called the length of the array and is never negative.\
-The length is part of the array's type; it must evaluate to a non-negative constant representable by a value of type int. The length of array a can be discovered using the built-in function len. The elements can be addressed by integer indices 0 through `len`-1. Array types are always one-dimensional but may be composed to form multi-dimensional types.\
-An array type T may not have an element of type T, or of a type containing T as a component, directly or indirectly, if those containing types are only array or struct types.
+The length of an array must evaluate to a non-negative constant representable by a value of type `int`, and can be discovered using the built-in function len. The elements can be addressed by integer indices 0 through `len`-1. Array types are always one-dimensional but may be composed to form multi-dimensional types.\
+An array type T may not have an element of type T, or of a type containing T as a component, if those containing types are only array or struct types.
+```
+genesisHash [32]byte
+```
 
-### Slice types
-A slice is a descriptor for a contiguous segment of an underlying array and provides access to a numbered sequence of elements from that array. A slice type denotes the set of all slices of arrays of its element type. The number of elements is called the length of the slice and is never negative. The value of an uninitialized slice is `nil`.\
-The length of a slice s can be discovered by the built-in function len; unlike with arrays it may change during execution. The elements can be addressed by integer indices 0 through `len`-1. The slice index of a given element may be less than the index of the same element in the underlying array.\
+### Slice
+A slice is a descriptor for a contiguous segment of an underlying array and provides access to a numbered sequence of elements from that array. The number of elements is called the length of the slice and is never negative. The value of an uninitialized slice is `nil`.\
+The length of a slice s can be discovered by the built-in function `len`; unlike with arrays it may change during execution. The elements can be addressed by integer indices 0 through `len`-1. The slice index of a given element may be less than the index of the same element in the underlying array.\
 A slice, once initialized, is always associated with an underlying array that holds its elements. A slice therefore shares storage with its array and with other slices of the same array; by contrast, distinct arrays always represent distinct storage.\
 The array underlying a slice may extend past the end of the slice. The capacity is a measure of that extent: it is the sum of the length of the slice and the length of the array beyond the slice; a slice of length up to that capacity can be created by slicing a new one from the original slice. The capacity of a slice a can be discovered using the built-in function `cap`.\
 A new, initialized slice value for a given element type T may be made using the built-in function `make`.
+```
+var blockData []byte
+var spendableUTXO []int
+```
 
-### Interface types
+### Interface
 An interface type defines a type set. A variable of interface type can store a value of any type that is in the type set of the interface. Such a type is said to implement the interface. The value of an uninitialized variable of interface type is `nil`.\
-Error: `error` is an interface type, wrappers around `string` type
+Error: `error` is an interface type
+```
+var err error
+```
 
-### Map types
-A map is an unordered group of elements of one type, called the element type, indexed by a set of unique keys of another type, called the key type. The value of an uninitialized map is nil.\
-The comparison operators == and != must be fully defined for operands of the key type; thus the key type must not be a function, map, or slice. If the key type is an interface type, these comparison operators must be defined for the dynamic key values; failure will cause a run-time panic.\
+### Map
+A map is an unordered group of elements of one type, called the element type, indexed by a set of unique keys of another type, called the key type. The value of an uninitialized map is `nil`.\
+The comparison operators `== `and `!=` must be fully defined for operands of the key type; thus the key type must not be a function, map, or slice. If the key type is an interface type, these comparison operators must be defined for the dynamic key values; failure will cause a run-time panic.\
 The number of map elements is called its length. For a map m, it can be discovered using the built-in function `len` and may change during execution. Elements may be added during execution using assignments and retrieved with index expressions; they may be removed with the `delete` and `clear` built-in function.\
 A new, empty map value is made using the built-in function `make`.
 ```
 	spentUTXOs := make(map[[32]byte][]int)
 ```
-The initial capacity does not bound its size: maps grow to accommodate the number of items stored in them, with the exception of `nil` maps. A `nil` map is equivalent to an empty map except that no elements may be added.
+The initial capacity does not bound its size: maps grow to accommodate the number of items stored in them, except `nil` maps. A `nil` map is equivalent to an empty map except that no elements may be added.
 
-### Channel types
-A channel provides a mechanism for concurrently executing functions to communicate by sending and receiving values of a specified element type. The value of an uninitialized channel is `nil`.\
-The optional `<-` operator specifies the channel direction, send or receive. If a direction is given, the channel is directional, otherwise it is bidirectional. A channel may be constrained only to send or only to receive by assignment or explicit conversion. The `<-` operator associates with the leftmost chan possible.\
-A new, initialized channel value can be made using the built-in function `make`.\
-The capacity, in number of elements, sets the size of the buffer in the channel. If the capacity is zero or absent, the channel is unbuffered and communication succeeds only when both a sender and receiver are ready. Otherwise, the channel is buffered and communication succeeds without blocking if the buffer is not full (sends) or not empty (receives). A nil channel is never ready for communication.\
-A channel may be closed with the built-in function `close`. The multi-valued assignment form of the receive operator reports whether a received value was sent before the channel was closed.\
-A single channel may be used in send statements, receive operations, and calls to the built-in functions `cap` and `len` by any number of goroutines without further synchronization. Channels act as FIFO queues.
+### Structures
+A structure or struct in Golang is a user-defined type that allows to group/combine items of possibly different types into a single type. This concept is generally compared with the classes in object-oriented programming. It can be termed as a lightweight class that does not support inheritance but supports composition.
+The `type` keyword is used to declare a new structure type.
+```
+type Block struct {
+	Timestamp int64
+	Hash      [32]byte
+	Data      []*Transaction
+	PrevHash  [32]byte
+	Height    int
+}
+```
 
 ## Multithreading
+### Goroutines
+Goroutine is a lightweight thread managed by the Go runtime. It is created using the `go` keyword before a function call:
+```
+go func() {
+    defer wg.Done()
+    _, err := http.Get(url)
+    if err != nil {
+        channel <- fmt.Sprintf("Error fetching %s: %v", url, err)
+        return
+    }
+    channel <- fmt.Sprintf("Fetched %s succesfully", url)
+}()
+```
+
+### Channel
+Channels are communication mechanisms that allow goroutines to exchange data safely. Channels act as FIFO queues, so they ensure synchronization between concurrent tasks.\
+A single channel may be used in send statements, receive operations.\
+A channel provides a mechanism for concurrently executing functions to communicate by sending and receiving values of a specified element type. The value of an uninitialized channel is `nil`.\
+The optional `<-` operator specifies the channel direction, send or receive. If a direction is given, the channel is directional, otherwise it is bidirectional. A channel may be constrained only to send or only to receive by assignment or explicit conversion. The `<-` operator associates with the leftmost chan possible.
+```
+channel <- fmt.Sprintf("Fetched %s succesfully", url)
+```
+A new, initialized channel value can be made using the built-in function `make`.
+```
+channel := make(chan string, len(urls))
+```
+The capacity, in number of elements, sets the size of the buffer in the channel. If the capacity is zero or absent, the channel is unbuffered and communication succeeds only when both a sender and receiver are ready. Otherwise, the channel is buffered and communication succeeds without blocking if the buffer is not full (sends) or not empty (receives). A `nil` channel is never ready for communication.\
+A channel may be closed with the built-in function `close`. The multi-valued assignment form of the receive operator reports whether a received value was sent before the channel was closed.
+```
+close(channel)
+```
+The length and capacity of a channel can be discovered by the built-in functions `cap` and `len` by any number of goroutines without further synchronization
+
+### Buffered channel
+By default, channels are unbuffered, meaning that they will only accept sends `chan <-`, and if there is a corresponding receive, `<- chan` ready to receive the sent value. Buffered channels accept a limited number of values without a corresponding receiver for those values.
+```
+channel := make(chan string, len(urls))
+```
+
+### WaitGroups
+A WaitGroup waits for a collection of goroutines to finish. The main goroutine calls `WaitGroup.Add` to set the number of goroutines to wait for. Then each of the goroutines runs and calls `WaitGroup.Done` when finished. At the same time, `WaitGroup.Wait` can be used to block until all goroutines have finished.\
+A WaitGroup must not be copied after first use.
+In the terminology of the Go memory model, a call to `WaitGroup.Done` “synchronizes before” the return of any `Wait` call that it unblocks.
+
+## Common package
+- `fmt`: provides formatting functions for I/O, is widely used for debugging and logging.
+- `time`: provides functions for handling time, sleeping, and parsing dates
+- `net/http`: is used for building HTTP servers and clients in Go
+- `sync`: provides synchronization primitives (such as WaitGroups)
+- `crypto`: contains various cryptographic implementations

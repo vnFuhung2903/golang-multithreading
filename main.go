@@ -3,21 +3,25 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"go_btc/concurrency"
+	"go_btc/entities"
 )
 
-const decimal = 100000000
+const decimal int = 100000000
 
 func main() {
-	genesisHash := sha256.Sum256([]byte("VCS"))
-	myBlockchain := NewBlockchain(genesisHash)
-	fmt.Println(myBlockchain)
+	concurrency.FetchURL()
 
-	alice := NewWallet()
+	genesisHash := sha256.Sum256([]byte("VCS"))
+	myBlockchain := entities.NewBlockchain(genesisHash)
+	fmt.Println("Created blockchain:", myBlockchain)
+
+	alice := entities.NewWallet()
 	fmt.Println("Alice's wallet:", alice.Address())
-	bob := NewWallet()
+	bob := entities.NewWallet()
 	fmt.Println("Bob's wallet:", bob.Address())
 
-	tx := NewCoinBaseTransaction(alice.Address(), 20*decimal)
+	tx := entities.NewCoinBaseTransaction(alice.Address(), 20*decimal)
 	newBlock := myBlockchain.MineBlock(tx)
 	err := myBlockchain.AddBlock(newBlock)
 	if err != nil {
@@ -26,7 +30,7 @@ func main() {
 	aliceBalance, _ := myBlockchain.FindSpendableUTXO(alice.Address())
 	fmt.Println("Alice's balance:", aliceBalance/decimal)
 
-	tx = NewTransaction(alice, bob.Address(), 1*decimal, myBlockchain)
+	tx = entities.NewTransaction(alice, bob.Address(), 1*decimal, myBlockchain)
 	newBlock = myBlockchain.MineBlock(tx)
 	err = myBlockchain.AddBlock(newBlock)
 	if err != nil {
