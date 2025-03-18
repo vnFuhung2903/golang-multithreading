@@ -1,4 +1,4 @@
-module go_btc
+module gobtc
 
 go 1.24
 

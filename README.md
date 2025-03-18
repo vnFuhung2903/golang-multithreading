@@ -1,4 +1,17 @@
 # Golang Multithreading
+## Table of content
+- [Formation history](#formation-history)
+- [Comparison Go vs other languages](#comparison-go-vs-java-javascript-python-and-c)
+- [Use cases in programming applications](#how-would-go-be-used-to-programing-applications)
+- [Function](#function)
+- [For-loop](#for-loop)
+- [Package/Import](#package-import)
+- [Go Module](#go-module)
+- [Naming Convention](#naming-convention)
+- [Data Structure](#data-structures)
+- [Multithreading](#multithreading)
+- [Common packages](#common-packages)
+
 ## Formation history
 Golang (or Go) was created by Google engineers Robert Griesemer, Rob Pike, and Ken Thompson in 2007 to address challenges in software development, such as slow compilation, dependency management, and concurrency. Officially released as an open-source language in 2009, Go was designed to be simple, efficient, and highly scalable, making it well-suited for cloud computing, networking, and system programming. Its syntax draws inspiration from C, but with modern features like garbage collection, built-in concurrency via goroutines, and a robust standard library.
 
@@ -113,7 +126,7 @@ func NewTransaction(from *Wallet, to string, amount int, blockchain *Blockchain)
 	...
 }
 ```
-### For-loop
+## For-loop
 **for** is Go’s only looping construct.
 ```
 func HashAllTransactions(txs []*Transaction) [32]byte {
@@ -130,19 +143,16 @@ The `range` form of the for loop iterates over a slice or map. When ranging over
 Every Go program is made up of packages. Programs start running in package `main`. By convention, the package name is the same as the last element of the import path.
 ```
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
-	"github.com/btcsuite/btcutil/base58"
-	"golang.org/x/crypto/ripemd160"
+	"gobtc/function"
+	"gobtc/multithreading"
 )
 ```
 ## Go module
 A module is a collection of Go packages stored in a file tree with a `go.mod` file at its root. The `go.mod` file defines the module’s module path, which is also the import path used for the root directory, and its dependency requirements, which are the other modules needed for a successful build. Each dependency requirement is written as a module path and a specific semantic version.
 ```
-module go_btc
+module gobtc
 
 go 1.24
 
@@ -185,7 +195,7 @@ const decimal int = 100000000
 ```
 ### String
 A string type represents the set of string values. A string value is a (possibly empty) sequence of bytes. The number of bytes is called the length of the string and is never negative. Strings are immutable: once created, it is impossible to change the contents of a string. The predeclared string type is `string`.\
-The length of a string s can be discovered using the built-in function `len`. The length is a compile-time constant if the string is a constant. A string's bytes can be accessed by integer indices 0 through `len`-1. It is illegal to take the address of such an element; if s[i] is the i'th byte of a string, &s[i] is invalid.
+The length of a string s can be discovered using the built-in function `len`. The length is a compile-time constant if the string is a constant. A string's bytes can be accessed by integer indices 0 through `len`-1. It is illegal to take the address of such an element; if s[i] is the i-th byte of a string, &s[i] is invalid.
 
 ### Array
 An array is a numbered sequence of elements of a single type, called the element type. The number of elements is called the length of the array and is never negative.\
@@ -281,9 +291,20 @@ A WaitGroup waits for a collection of goroutines to finish. The main goroutine c
 A WaitGroup must not be copied after first use.
 In the terminology of the Go memory model, a call to `WaitGroup.Done` “synchronizes before” the return of any `Wait` call that it unblocks.
 
-## Common package
+## Common packages
 - `fmt`: provides formatting functions for I/O, is widely used for debugging and logging.
 - `time`: provides functions for handling time, sleeping, and parsing dates
 - `net/http`: is used for building HTTP servers and clients in Go
 - `sync`: provides synchronization primitives (such as WaitGroups)
 - `crypto`: contains various cryptographic implementations
+- `errors`: provides functions for defining, wrapping, and unwrapping errors, is used for creating and handling errors manually.
+
+## Example code
+- The **Multithreading** example codes are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/multithreading
+- The **Function** example codes, the **For-loop** example codes and the **Data Structure** example codes are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/entities
+- The **Package Import** example codes, and the **Naming Convention** example codes are in all `.go` files
+- The **Go Module** example codes are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/go.mod
+- The **Common packages** example codes:
+  * The `fmt`, `net/http`, `sync` package are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/multithreading/fetch.go
+  * The `time`, `errors` package are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/entities/blockchain.go
+  * The `crypto` package is in https://github.com/vnFuhung2903/golang-multithreading/blob/master/entities/wallet.go

@@ -3,14 +3,14 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
-	"go_btc/concurrency"
-	"go_btc/entities"
+	"gobtc/entities"
+	"gobtc/multithreading"
 )
 
 const decimal int = 100000000
 
 func main() {
-	concurrency.FetchURL()
+	multithreading.FetchURL()
 
 	genesisHash := sha256.Sum256([]byte("VCS"))
 	myBlockchain := entities.NewBlockchain(genesisHash)
