@@ -250,15 +250,12 @@ type Block struct {
 ### Goroutines
 Goroutine is a lightweight thread managed by the Go runtime. It is created using the `go` keyword before a function call:
 ```
-go func() {
+go func(tx *entities.Transaction) {
     defer wg.Done()
-    _, err := http.Get(url)
-    if err != nil {
-        channel <- fmt.Sprintf("Error fetching %s: %v", url, err)
-        return
-    }
-    channel <- fmt.Sprintf("Fetched %s succesfully", url)
-}()
+    txs = append(txs, tx)
+    channel <- fmt.Sprintf("Transfer from Alice to Bob %d btc", i)
+    time.Sleep(1000 * time.Millisecond)
+}(tx)
 ```
 
 ### Channel
@@ -267,11 +264,11 @@ A single channel may be used in send statements, receive operations.\
 A channel provides a mechanism for concurrently executing functions to communicate by sending and receiving values of a specified element type. The value of an uninitialized channel is `nil`.\
 The optional `<-` operator specifies the channel direction, send or receive. If a direction is given, the channel is directional, otherwise it is bidirectional. A channel may be constrained only to send or only to receive by assignment or explicit conversion. The `<-` operator associates with the leftmost chan possible.
 ```
-channel <- fmt.Sprintf("Fetched %s succesfully", url)
+channel <- fmt.Sprintf("Transfer from Alice to Bob %d btc", i)
 ```
 A new, initialized channel value can be made using the built-in function `make`.
 ```
-channel := make(chan string, len(urls))
+channel := make(chan string, 10)
 ```
 The capacity, in number of elements, sets the size of the buffer in the channel. If the capacity is zero or absent, the channel is unbuffered and communication succeeds only when both a sender and receiver are ready. Otherwise, the channel is buffered and communication succeeds without blocking if the buffer is not full (sends) or not empty (receives). A `nil` channel is never ready for communication.\
 A channel may be closed with the built-in function `close`. The multi-valued assignment form of the receive operator reports whether a received value was sent before the channel was closed.
@@ -283,28 +280,40 @@ The length and capacity of a channel can be discovered by the built-in functions
 ### Buffered channel
 By default, channels are unbuffered, meaning that they will only accept sends `chan <-`, and if there is a corresponding receive, `<- chan` ready to receive the sent value. Buffered channels accept a limited number of values without a corresponding receiver for those values.
 ```
-channel := make(chan string, len(urls))
+channel := make(chan string, 10)
 ```
 
 ### WaitGroups
 A WaitGroup waits for a collection of goroutines to finish. The main goroutine calls `WaitGroup.Add` to set the number of goroutines to wait for. Then each of the goroutines runs and calls `WaitGroup.Done` when finished. At the same time, `WaitGroup.Wait` can be used to block until all goroutines have finished.\
+```
+for i := 1; i < 4; i++ {
+    wg.Add(1)
+    tx = entities.NewTransaction(bob, alice.Address(), i*decimal, myBlockchain)
+    go func(tx *entities.Transaction) {
+        defer wg.Done()
+        txs = append(txs, tx)
+        channel <- fmt.Sprintf("Transfer from Bob to Alice %d btc", i)
+        time.Sleep(1000 * time.Millisecond)
+    }(tx)
+}
+wg.Wait()
+```
 A WaitGroup must not be copied after first use.
 In the terminology of the Go memory model, a call to `WaitGroup.Done` “synchronizes before” the return of any `Wait` call that it unblocks.
 
 ## Common packages
 - `fmt`: provides formatting functions for I/O, is widely used for debugging and logging.
 - `time`: provides functions for handling time, sleeping, and parsing dates
-- `net/http`: is used for building HTTP servers and clients in Go
 - `sync`: provides synchronization primitives (such as WaitGroups)
 - `crypto`: contains various cryptographic implementations
 - `errors`: provides functions for defining, wrapping, and unwrapping errors, is used for creating and handling errors manually.
 
 ## Example code
-- The **Multithreading** example codes are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/multithreading
+- The **Multithreading** example codes are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/main.go
 - The **Function** example codes, the **For-loop** example codes and the **Data Structure** example codes are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/entities
 - The **Package Import** example codes, and the **Naming Convention** example codes are in all `.go` files
 - The **Go Module** example codes are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/go.mod
 - The **Common packages** example codes:
-  * The `fmt`, `net/http`, `sync` package are in https://github.com/vnFuhung2903/golang-multithreading/tree/master/multithreading/fetch.go
+  * The `fmt`, `sync` package are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/main.go
   * The `time`, `errors` package are in https://github.com/vnFuhung2903/golang-multithreading/blob/master/entities/blockchain.go
   * The `crypto` package is in https://github.com/vnFuhung2903/golang-multithreading/blob/master/entities/wallet.go
